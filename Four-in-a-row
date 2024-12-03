@@ -1,0 +1,120 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int BOARD_ROWS = 6;
+const int BOARD_COLUMNS = 7;
+const char EMPTY_CELL = '.';
+
+void initializeBoard(vector<vector<char>>& board) {
+    board = vector<vector<char>>(BOARD_ROWS, vector<char>(BOARD_COLUMNS, EMPTY_CELL));
+}
+
+void displayBoard(const vector<vector<char>>& board) {
+    cout << "\n   ";
+    for (int col = 0; col < BOARD_COLUMNS; ++col) {
+        cout << col << " ";
+    }
+    cout << "\n";
+
+    for (int row = 0; row < BOARD_ROWS; ++row) {
+        cout << row << "| ";
+        for (int col = 0; col < BOARD_COLUMNS; ++col) {
+            cout << board[row][col] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+bool dropMarker(vector<vector<char>>& board, int column, char playerMarker) {
+    if (column < 0 || column >= BOARD_COLUMNS) {
+        cout << "Invalid column. Please choose a column between 0 and " << BOARD_COLUMNS - 1 << ".\n";
+        return false;
+    }
+
+    for (int row = BOARD_ROWS - 1; row >= 0; --row) {
+        if (board[row][column] == EMPTY_CELL) {
+            board[row][column] = playerMarker;
+            return true;
+        }
+    }
+
+    cout << "Column " << column << " is full. plz Choose a different column.\n";
+    return false;
+}
+
+bool isWinningMove(const vector<vector<char>>& board, char playerMarker) {
+    for (int row = 0; row < BOARD_ROWS; ++row) {
+        for (int col = 0; col < BOARD_COLUMNS; ++col) {
+            if (col + 3 < BOARD_COLUMNS &&
+                board[row][col] == playerMarker &&
+                board[row][col + 1] == playerMarker &&
+                board[row][col + 2] == playerMarker &&
+                board[row][col + 3] == playerMarker)
+                return true;
+
+            if (row + 3 < BOARD_ROWS &&
+                board[row][col] == playerMarker &&
+                board[row + 1][col] == playerMarker &&
+                board[row + 2][col] == playerMarker &&
+                board[row + 3][col] == playerMarker)
+                return true;
+
+            if (row + 3 < BOARD_ROWS && col + 3 < BOARD_COLUMNS &&
+                board[row][col] == playerMarker &&
+                board[row + 1][col + 1] == playerMarker &&
+                board[row + 2][col + 2] == playerMarker &&
+                board[row + 3][col + 3] == playerMarker)
+                return true;
+
+            if (row + 3 < BOARD_ROWS && col - 3 >= 0 &&
+                board[row][col] == playerMarker &&
+                board[row + 1][col - 1] == playerMarker &&
+                board[row + 2][col - 2] == playerMarker &&
+                board[row + 3][col - 3] == playerMarker)
+                return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    vector<vector<char>> gameBoard;
+    initializeBoard(gameBoard);
+
+    char currentPlayerMarker = 'X';
+    int totalMoves = 0;
+    bool gameWon = false;
+
+    cout << "Welcome to Four-in-a-Row!\n";
+    displayBoard(gameBoard);
+
+    while (totalMoves < BOARD_ROWS * BOARD_COLUMNS && !gameWon) {
+        int selectedColumn;
+        cout << "Player " << currentPlayerMarker << "'s turn. Enter a column (0-" << BOARD_COLUMNS - 1 << "): ";
+
+        while (!(cin >> selectedColumn)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input. Please enter a number between 0 and " << BOARD_COLUMNS - 1 << ": ";
+        }
+
+        if (dropMarker(gameBoard, selectedColumn, currentPlayerMarker)) {
+            ++totalMoves;
+            displayBoard(gameBoard);
+
+            if (isWinningMove(gameBoard, currentPlayerMarker)) {
+                cout << "Congratulations! Player " << currentPlayerMarker << " wins!\n";
+                gameWon = true;
+            } else {
+                currentPlayerMarker = (currentPlayerMarker == 'X') ? 'O' : 'X';
+            }
+        }
+    }
+
+    if (!gameWon) {
+        cout << "It's a draw! No more moves available.\n";
+    }
+
+    return 0;
+}
