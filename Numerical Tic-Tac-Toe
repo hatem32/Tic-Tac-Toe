@@ -1,0 +1,124 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int BOARD_SIZE = 3;
+const int WINNING_SUM = 15;
+
+void initializeBoard(vector<vector<int>>& board) {
+    board.assign(BOARD_SIZE, vector<int>(BOARD_SIZE, 0));
+}
+
+void displayBoard(const vector<vector<int>>& board) {
+    cout << "\n   ";
+    for (int col = 0; col < BOARD_SIZE; ++col) cout << col << "  ";
+    cout << "\n";
+
+    for (int row = 0; row < BOARD_SIZE; ++row) {
+        cout << row << " | ";
+        for (int cell : board[row]) {
+            cout << (cell == 0 ? "." : to_string(cell)) << "  ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+bool isValidNumber(int num, unordered_set<int>& usedNumbers, int player) {
+    if (usedNumbers.count(num) || num < 1 || num > 9) return false;
+    return (player == 1 && num % 2 != 0) || (player == 2 && num % 2 == 0);
+}
+
+bool isWinningMove(const vector<vector<int>>& board) {
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        if (accumulate(board[i].begin(), board[i].end(), 0) == WINNING_SUM) return true;
+        int colSum = 0;
+        for (int j = 0; j < BOARD_SIZE; ++j) colSum += board[j][i];
+        if (colSum == WINNING_SUM) return true;
+    }
+
+    int mainDiagonalSum = 0, antiDiagonalSum = 0;
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        mainDiagonalSum += board[i][i];
+        antiDiagonalSum += board[i][BOARD_SIZE - i - 1];
+    }
+
+    return mainDiagonalSum == WINNING_SUM || antiDiagonalSum == WINNING_SUM;
+}
+
+int getValidNumber(unordered_set<int>& usedNumbers, int player) {
+    int num;
+    while (true) {
+        cout << "Player " << player << " (" << (player == 1 ? "odd" : "even") << " numbers), enter a number: ";
+        cin >> num;
+        if (cin.fail() || !isValidNumber(num, usedNumbers, player)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid number. Choose an unused " << (player == 1 ? "odd" : "even") << " number between 1 and 9.\n";
+        } else {
+            usedNumbers.insert(num);
+            return num;
+        }
+    }
+}
+
+pair<int, int> getValidPosition(vector<vector<int>>& board) {
+    int row, col;
+    while (true) {
+        cout << "Enter row and column (0-2): ";
+        cin >> row >> col;
+        if (cin.fail() || row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE || board[row][col] != 0) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid position. Choose an empty cell within range 0-2.\n";
+        } else {
+            return {row, col};
+        }
+    }
+}
+
+void playGame() {
+    vector<vector<int>> board;
+    unordered_set<int> usedNumbers;
+    initializeBoard(board);
+
+    int currentPlayer = 1;
+    int moves = 0;
+
+    cout << "------------------------Numerical Tic-Tac-Toe---------------------------------\n"
+            << "Rules:\n"
+
+            << "Player 1 uses odd numbers (1, 3, 5, 7, 9).\n"
+         << "Player 2 uses even numbers (2, 4, 6, 8).\n";
+
+    while (moves < BOARD_SIZE * BOARD_SIZE) {
+        displayBoard(board);
+        int num = getValidNumber(usedNumbers, currentPlayer);
+        auto [row, col] = getValidPosition(board);
+
+        board[row][col] = num;
+        ++moves;
+
+        if (isWinningMove(board)) {
+            displayBoard(board);
+            cout << "Player " << currentPlayer << " wins with a sum of 15!\n";
+            return;
+        }
+
+        currentPlayer = 3 - currentPlayer;
+    }
+
+    displayBoard(board);
+    cout << "It's a draw! No winning moves.\n";
+}
+
+int main() {
+    while (true) {
+        playGame();
+        cout << "Play again? (y/n): ";
+        char choice;
+        cin >> choice;
+        if (choice != 'y' && choice != 'Y') break;
+    }
+    cout << "Thanks for playing Numerical Tic-Tac-Toe!\n";
+    return 0;
+}
