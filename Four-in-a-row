@@ -8,7 +8,6 @@ const char EMPTY_CELL = '.';
 void initializeBoard(vector<vector<char>>& board) {
     board = vector<vector<char>>(BOARD_ROWS, vector<char>(BOARD_COLUMNS, EMPTY_CELL));
 }
-
 void displayBoard(const vector<vector<char>>& board) {
     cout << "\n   ";
     for (int col = 0; col < BOARD_COLUMNS; ++col) {
@@ -39,7 +38,7 @@ bool dropMarker(vector<vector<char>>& board, int column, char playerMarker) {
         }
     }
 
-    cout << "Column " << column << " is full. plz Choose a different column.\n";
+    cout << "Column " << column << " is full. Choose a different column.\n";
     return false;
 }
 
@@ -79,42 +78,49 @@ bool isWinningMove(const vector<vector<char>>& board, char playerMarker) {
 }
 
 int main() {
-    vector<vector<char>> gameBoard;
-    initializeBoard(gameBoard);
+    char playAgain;
+    do {
+        vector<vector<char>> gameBoard;
+        initializeBoard(gameBoard);
 
-    char currentPlayerMarker = 'X';
-    int totalMoves = 0;
-    bool gameWon = false;
+        char currentPlayerMarker = 'X';
+        int totalMoves = 0;
+        bool gameWon = false;
 
-    cout << "Welcome to Four-in-a-Row!\n";
-    displayBoard(gameBoard);
+        cout << "Welcome to Four-in-a-Row!\n";
+        displayBoard(gameBoard);
 
-    while (totalMoves < BOARD_ROWS * BOARD_COLUMNS && !gameWon) {
-        int selectedColumn;
-        cout << "Player " << currentPlayerMarker << "'s turn. Enter a column (0-" << BOARD_COLUMNS - 1 << "): ";
+        while (totalMoves < BOARD_ROWS * BOARD_COLUMNS && !gameWon) {
+            int selectedColumn;
+            cout << "Player " << currentPlayerMarker << "'s turn. Enter a column (0-" << BOARD_COLUMNS - 1 << "): ";
 
-        while (!(cin >> selectedColumn)) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input. Please enter a number between 0 and " << BOARD_COLUMNS - 1 << ": ";
-        }
+            while (!(cin >> selectedColumn)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Invalid input. Please enter a number between 0 and " << BOARD_COLUMNS - 1 << ": ";
+            }
 
-        if (dropMarker(gameBoard, selectedColumn, currentPlayerMarker)) {
-            ++totalMoves;
-            displayBoard(gameBoard);
+            if (dropMarker(gameBoard, selectedColumn, currentPlayerMarker)) {
+                ++totalMoves;
+                displayBoard(gameBoard);
 
-            if (isWinningMove(gameBoard, currentPlayerMarker)) {
-                cout << "Congratulations! Player " << currentPlayerMarker << " wins!\n";
-                gameWon = true;
-            } else {
-                currentPlayerMarker = (currentPlayerMarker == 'X') ? 'O' : 'X';
+                if (isWinningMove(gameBoard, currentPlayerMarker)) {
+                    cout << "Congratulations! Player " << currentPlayerMarker << " wins!\n";
+                    gameWon = true;
+                } else {
+                    currentPlayerMarker = (currentPlayerMarker == 'X') ? 'O' : 'X';
+                }
             }
         }
-    }
 
-    if (!gameWon) {
-        cout << "It's a draw! No more moves available.\n";
-    }
+        if (!gameWon) {
+            cout << "It's a draw! No more moves available.\n";
+        }
 
+        cout << "Do you want to play again? (y/n): ";
+        cin >> playAgain;
+    } while (playAgain == 'y' || playAgain == 'Y');
+
+    cout << "Thank you for played Four in a Row game . bye\n";
     return 0;
 }
