@@ -1,6 +1,6 @@
 
-#ifndef _3X3X_O_H
-#define _3X3X_O_H
+#ifndef _PYRAMIDX_O_H
+#define _PYRAMIDX_O_H
 
 #include "BoardGame_Classes.h"
 
