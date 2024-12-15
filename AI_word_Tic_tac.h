@@ -107,36 +107,40 @@ T Tic_Tac_Toe_Minimax_Player<T>::getsymbol() {
         dictionary.push_back(word);
     }
 
-    set<char> validSymbols = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-                              'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    
+    set<char> validSymbols={'A','B','C', 'D','E','F', 'G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
-    char bestSymbol = 'A';
-    int maxMatches = -1;
 
+  
+    char bestSymbol = 'A'; 
+    int maxMatches = -1;   
+
+   
     for (char candidate : validSymbols) {
         int matches = 0;
 
+     
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (getBoardValue(i, j) == 0) { // Use indirect access
-                    updateBoard(i, j, candidate); // Simulate move
+                if (getBoardValue(i,j) == 0) {
+                    this->boardPtr->update_board(i, j, candidate);
 
-                    // Check all rows for potential matches in the dictionary
+            
+                    string line;
                     for (int row = 0; row < 3; row++) {
-                        string line;
                         for (int col = 0; col < 3; col++) {
-                            T cellValue = getBoardValue(row, col);
-                            if (cellValue != 0) {
-                                line += cellValue;
+                            if (getBoardValue(row,col)!= 0) {
+                                line += getBoardValue(row,col);
                             }
                         }
+                        // If line exists in the dictionary, count it
                         if (find(dictionary.begin(), dictionary.end(), line) != dictionary.end()) {
                             matches++;
                         }
                     }
 
                     // Undo the move to evaluate the next position
-                    updateBoard(i, j, 0);
+                    this->boardPtr->update_board(i, j, 0);
                 }
             }
         }
@@ -167,10 +171,10 @@ void Tic_Tac_Toe_Minimax_Player<T>::getmove(int& x, int& y) {
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            if (getBoardValue(i, j) == 0) { // Check empty positions
-                updateBoard(i, j, this->symbol); // Simulate move
+            if (getBoardValue(i,j) == 0) { // Check empty positions
+                ticTacToeBoard->update_board(i, j, this->symbol);
                 int moveScore = minimax(*ticTacToeBoard, false);
-                updateBoard(i, j, 0); // Undo the move
+                ticTacToeBoard->update_board(i, j, 0); // Undo the move
 
                 if (moveScore > bestMoveScore) {
                     bestMoveScore = moveScore;
