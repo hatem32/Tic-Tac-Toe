@@ -11,8 +11,14 @@ public:
     bool is_win() ;
     bool is_draw();
     bool game_is_over();
+    T getBoardValue(int row, int col) const; // Get board value
 
 };
+template <typename T>
+T Tic_Tac_Toe_Board<T>::getBoardValue(int row, int col) const {
+
+    return this->board[row][col]; // Access value indirectly
+}
 
 template <typename T>
 class Tic_Tac_Toe_Player : public Player<T> {
@@ -39,9 +45,9 @@ public:
 #include <algorithm>
 using namespace std;
 int indexStart(char c){
-    map<const char,int> map1={{ 'A',0} , { 'B',110} , { 'C',214} , { 'D',268} , { 'E',375} , { 'F',498} , { 'G',559} , { 'H',661} , 
+    map<const char,int> map1={{ 'A',0} , { 'B',110} , { 'C',214} , { 'D',268} , { 'E',375} , { 'F',498} , { 'G',559} , { 'H',661} ,
     { 'I',734} , { 'J',770} , { 'K',796} , { 'L',840} , { 'M',916} , { 'N',1012} , { 'O',1115} , { 'P',1191} ,
-    { 'Q',1311} , { 'R',1314} , { 'S',1401} , { 'T',1533} , { 'U',1674} , { 'V',1706} , { 'W',1735} , { 'X',1812} , 
+    { 'Q',1311} , { 'R',1314} , { 'S',1401} , { 'T',1533} , { 'U',1674} , { 'V',1706} , { 'W',1735} , { 'X',1812} ,
     { 'Y',1845} , { 'Z',1925}};
     return map1[c];
 }
@@ -94,45 +100,85 @@ template <typename T>
 bool Tic_Tac_Toe_Board<T>::is_win() {
     vector<string> dic_vector;
     string str;
-    
-    ifstream inputFile("text.txt");
+
+    // Open the dictionary file
+    ifstream inputFile("text2.txt");
     if (!inputFile) {
-        cerr << "Error opening file!" << endl;
-        return 1;
+        cerr << "Error opening dictionary file!" << endl;
+        return false; // Cannot determine win without a dictionary
     }
-     while (inputFile >> str) {
+
+    // Load the dictionary into dic_vector
+    while (inputFile >> str) {
         dic_vector.push_back(str);
     }
-    for(int k=indexStart(this->board[0][0]);k<dic_vector.size();k++){
-        if(this->board[0][0]==dic_vector[k][0] && this->board[1][1]==dic_vector[k][1] && this->board[2][2]==dic_vector[k][2])
-        {
-            return true;
-            break;
-        }
-        
-    } 
-    for(int k=indexStart(this->board[0][2]);k<dic_vector.size();k++){
-        if(this->board[0][2]==dic_vector[k][0] && this->board[1][1]==dic_vector[k][1] && this->board[2][0]==dic_vector[k][2])
-        {
-            return true;
+    inputFile.close(); // Close the file
+
+    // Validate that the dictionary is not empty
+    if (dic_vector.empty()) {
+        cerr << "Dictionary is empty!" << endl;
+        return false;
+    }
+
+    // Lambda to validate characters
+    auto isValidChar = [](char c) {
+        return c >= 'A' && c <= 'Z';
+    };
+
+    // Check the two diagonals
+    if (isValidChar(this->board[0][0]) && isValidChar(this->board[1][1]) && isValidChar(this->board[2][2])) {
+        for (int k = indexStart(this->board[0][0]); k < dic_vector.size(); k++) {
+            if (dic_vector[k].size() >= 3 &&
+                this->board[0][0] == dic_vector[k][0] &&
+                this->board[1][1] == dic_vector[k][1] &&
+                this->board[2][2] == dic_vector[k][2]) {
+                return true;
+            }
         }
     }
-    for(int i=0; i < this->rows; i++ ){
-        for(int j = indexStart(this->board[i][0]) ; j<dic_vector.size();j++){
-            if(this->board[i][0]==dic_vector[j][0] && this->board[i][1]==dic_vector[j][1] && this->board[i][2]==dic_vector[j][2]){
+
+    if (isValidChar(this->board[0][2]) && isValidChar(this->board[1][1]) && isValidChar(this->board[2][0])) {
+        for (int k = indexStart(this->board[0][2]); k < dic_vector.size(); k++) {
+            if (dic_vector[k].size() >= 3 &&
+                this->board[0][2] == dic_vector[k][0] &&
+                this->board[1][1] == dic_vector[k][1] &&
+                this->board[2][0] == dic_vector[k][2]) {
                 return true;
             }
         }
-    } 
-    for(int i=0; i < this->rows; i++ ){
-        for(int j = indexStart(this->board[0][i]) ; j<dic_vector.size();j++){
-            if(this->board[0][i]==dic_vector[j][0] && this->board[1][i]==dic_vector[j][1] && this->board[2][i]==dic_vector[j][2]){
-                return true;
+    }
+
+    // Check rows
+    for (int i = 0; i < this->rows; i++) {
+        if (isValidChar(this->board[i][0]) && isValidChar(this->board[i][1]) && isValidChar(this->board[i][2])) {
+            for (int j = indexStart(this->board[i][0]); j < dic_vector.size(); j++) {
+                if (dic_vector[j].size() >= 3 &&
+                    this->board[i][0] == dic_vector[j][0] &&
+                    this->board[i][1] == dic_vector[j][1] &&
+                    this->board[i][2] == dic_vector[j][2]) {
+                    return true;
+                }
             }
         }
-    } 
+    }
+
+    // Check columns
+    for (int i = 0; i < this->columns; i++) {
+        if (isValidChar(this->board[0][i]) && isValidChar(this->board[1][i]) && isValidChar(this->board[2][i])) {
+            for (int j = indexStart(this->board[0][i]); j < dic_vector.size(); j++) {
+                if (dic_vector[j].size() >= 3 &&
+                    this->board[0][i] == dic_vector[j][0] &&
+                    this->board[1][i] == dic_vector[j][1] &&
+                    this->board[2][i] == dic_vector[j][2]) {
+                    return true;
+                }
+            }
+        }
+    }
+
     return false;
 }
+
 
 
 // Return true if 9 moves are done and no winner
@@ -188,7 +234,7 @@ void Tic_Tac_Toe_Random_Player<T>::getmove(int& x, int& y) {
     y = rand() % this->dimension;
     string str={"ABCDEFGHIJKLMNOPQRSTUVWXYZ"};
     this->symbol = str[ rand() % 26];
-    
+
 }
 
 template <typename T>
