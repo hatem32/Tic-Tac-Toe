@@ -8,6 +8,7 @@
 
 //----------------------------------------------------------------
 //Implementation
+
 #include <algorithm>
 #include <limits>
 #include <set>
@@ -97,7 +98,7 @@ int Tic_Tac_Toe_Minimax_Player<T>::minimax(Tic_Tac_Toe_Board<T>& board, bool isM
 template <typename T>
 T Tic_Tac_Toe_Minimax_Player<T>::getsymbol() {
     vector<string> dictionary;
-    ifstream inputFile("text.txt");
+    ifstream inputFile("text2.txt");
     if (!inputFile) {
         cerr << "Error opening dictionary file!" << endl;
         return 'A'; // Default fallback
